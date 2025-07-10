@@ -12,19 +12,19 @@ The test suite is organized into three main files, each focusing on a specific E
 **Purpose**: Tests fundamental game mechanics and environment functionality  
 **Coverage**: US1.1 (Initialize Board), US1.2 (Apply Action & Transition), US1.3 (Terminal Detection)  
 **Dependencies**: Only requires `environment.h` and basic C++ libraries  
-**Test Count**: 13 tests (1 implicit board initialization + 5 action/transition + 7 terminal detection)
+**Test Count**: 19 tests (1 implicit board initialization + 5 action/transition + 7 terminal detection + 6 larger board tests)
 
 ### 2. `test_state_representation.cpp` - Epic 2: State & Action Representation  
 **Purpose**: Tests individual state representation methods in isolation  
 **Coverage**: US2.1 (Flattened State Vector), US2.2 (One-Hot Encoding), US2.3 (Action Masking)  
 **Dependencies**: Requires all Epic 1 functionality to be working  
-**Test Count**: 17 tests (5 action masking + 6 flattened state + 6 one-hot encoding)
+**Test Count**: 21 tests (5 action masking + 6 flattened state + 6 one-hot encoding + 4 larger board tests)
 
 ### 3. `test_integration.cpp` - Epic 2: State Representation Integration  
 **Purpose**: Tests cross-feature validation and consistency between all state representations  
 **Coverage**: Integration testing to ensure all Epic 2 features work together seamlessly  
 **Dependencies**: Requires all Epic 1 and Epic 2 individual features to be working  
-**Test Count**: 9 comprehensive integration tests
+**Test Count**: 14 comprehensive integration tests (9 original + 5 larger board integration tests)
 
 ## Design Principles
 
@@ -56,6 +56,13 @@ Each test includes:
 - Descriptive test names explaining the purpose
 - Inline comments explaining the test logic
 - Assert statements with clear validation criteria
+
+### 5. **Scalability Testing Strategy**
+The test suite includes comprehensive testing for larger board sizes:
+- **6x6 Board Testing**: Validates functionality on medium-scale boards (36 cells, 72 one-hot elements)
+- **10x10 Board Testing**: Validates functionality on large-scale boards (100 cells, 200 one-hot elements)
+- **Cross-Size Consistency**: Ensures algorithms work consistently regardless of board size
+- **Performance Validation**: Tests that larger boards don't cause memory or performance issues
 
 ## Test Construction Patterns
 

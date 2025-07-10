@@ -298,11 +298,291 @@ int main() {
     
     std::cout << "✓ No memory corruption detected, all representations independent" << std::endl;
     
+    std::cout << "\n=== TESTING LARGER BOARD INTEGRATION (6x6 and 10x10) ===" << std::endl;
+    
+    // Test 10: Comprehensive 6x6 board integration
+    std::cout << "\n10. Testing comprehensive 6x6 board integration..." << std::endl;
+    auto reward_fn_6x6 = std::make_shared<DefaultReward>();
+    Environment env_6x6(6, reward_fn_6x6);
+    
+    // Test initial state consistency on 6x6
+    env_6x6.reset();
+    std::vector<float> init_flat_6x6 = env_6x6.get_flattened_state();
+    std::vector<float> init_oh_6x6 = env_6x6.get_one_hot_state();
+    std::vector<bool> init_mask_6x6 = env_6x6.get_action_mask();
+    
+    // Verify dimensions
+    assert(init_flat_6x6.size() == 36);   // 6x6 = 36
+    assert(init_oh_6x6.size() == 72);     // 2 * 6 * 6 = 72
+    assert(init_mask_6x6.size() == 36);   // 6x6 = 36
+    
+    // Verify all representations show empty board
+    for (int i = 0; i < 36; ++i) {
+        assert(init_flat_6x6[i] == 0.0f);     // Empty in flattened
+        assert(init_oh_6x6[i] == 0.0f);       // Player 1 channel empty
+        assert(init_oh_6x6[36 + i] == 0.0f);  // Player 2 channel empty
+        assert(init_mask_6x6[i] == true);     // All cells available
+    }
+    std::cout << "  ✓ 6x6 initial state consistency verified" << std::endl;
+    
+    // Test consistency during complex game sequence on 6x6
+    std::vector<int> moves_6x6 = {0, 35, 1, 34, 5, 30, 6, 29, 7, 28, 12, 23, 13, 22, 18, 17};
+    for (int move_idx = 0; move_idx < moves_6x6.size(); ++move_idx) {
+        int move = moves_6x6[move_idx];
+        
+        // Verify move is valid before making it
+        std::vector<bool> pre_mask = env_6x6.get_action_mask();
+        assert(pre_mask[move] == true);
+        
+        env_6x6.step(Action{move});
+        
+        // Get all representations after move
+        std::vector<float> curr_flat = env_6x6.get_flattened_state();
+        std::vector<float> curr_oh = env_6x6.get_one_hot_state();
+        std::vector<bool> curr_mask = env_6x6.get_action_mask();
+        
+        // Verify consistency across all cells
+        for (int i = 0; i < 36; ++i) {
+            float flat_val = curr_flat[i];
+            bool has_p1_oh = (curr_oh[i] == 1.0f);
+            bool has_p2_oh = (curr_oh[36 + i] == 1.0f);
+            bool is_available = curr_mask[i];
+            
+            // Core consistency checks
+            bool is_empty = (flat_val == 0.0f);
+            bool is_empty_oh = (!has_p1_oh && !has_p2_oh);
+            assert(is_empty == is_empty_oh);
+            assert(is_empty == is_available);
+            
+            // Player encoding consistency
+            if (flat_val == 1.0f) {
+                assert(has_p1_oh && !has_p2_oh && !is_available);
+            } else if (flat_val == -1.0f) {
+                assert(!has_p1_oh && has_p2_oh && !is_available);
+            }
+            
+            // No cell should have both players
+            assert(!(has_p1_oh && has_p2_oh));
+        }
+    }
+    std::cout << "  ✓ 6x6 complex game sequence maintains perfect consistency" << std::endl;
+    
+    // Test 11: Comprehensive 10x10 board integration
+    std::cout << "\n11. Testing comprehensive 10x10 board integration..." << std::endl;
+    auto reward_fn_10x10 = std::make_shared<DefaultReward>();
+    Environment env_10x10(10, reward_fn_10x10);
+    
+    // Test initial state consistency on 10x10
+    env_10x10.reset();
+    std::vector<float> init_flat_10x10 = env_10x10.get_flattened_state();
+    std::vector<float> init_oh_10x10 = env_10x10.get_one_hot_state();
+    std::vector<bool> init_mask_10x10 = env_10x10.get_action_mask();
+    
+    // Verify dimensions
+    assert(init_flat_10x10.size() == 100);  // 10x10 = 100
+    assert(init_oh_10x10.size() == 200);    // 2 * 10 * 10 = 200
+    assert(init_mask_10x10.size() == 100);  // 10x10 = 100
+    
+    // Verify all representations show empty board
+    for (int i = 0; i < 100; ++i) {
+        assert(init_flat_10x10[i] == 0.0f);      // Empty in flattened
+        assert(init_oh_10x10[i] == 0.0f);        // Player 1 channel empty
+        assert(init_oh_10x10[100 + i] == 0.0f);  // Player 2 channel empty
+        assert(init_mask_10x10[i] == true);      // All cells available
+    }
+    std::cout << "  ✓ 10x10 initial state consistency verified" << std::endl;
+    
+    // Test consistency during complex game sequence on 10x10
+    std::vector<int> moves_10x10 = {0, 99, 1, 98, 10, 89, 11, 88, 20, 79, 21, 78, 44, 55, 45, 54};
+    for (int move_idx = 0; move_idx < moves_10x10.size(); ++move_idx) {
+        int move = moves_10x10[move_idx];
+        
+        // Verify move is valid before making it
+        std::vector<bool> pre_mask = env_10x10.get_action_mask();
+        assert(pre_mask[move] == true);
+        
+        env_10x10.step(Action{move});
+        
+        // Get all representations after move
+        std::vector<float> curr_flat = env_10x10.get_flattened_state();
+        std::vector<float> curr_oh = env_10x10.get_one_hot_state();
+        std::vector<bool> curr_mask = env_10x10.get_action_mask();
+        
+        // Verify consistency across all cells
+        for (int i = 0; i < 100; ++i) {
+            float flat_val = curr_flat[i];
+            bool has_p1_oh = (curr_oh[i] == 1.0f);
+            bool has_p2_oh = (curr_oh[100 + i] == 1.0f);
+            bool is_available = curr_mask[i];
+            
+            // Core consistency checks
+            bool is_empty = (flat_val == 0.0f);
+            bool is_empty_oh = (!has_p1_oh && !has_p2_oh);
+            assert(is_empty == is_empty_oh);
+            assert(is_empty == is_available);
+            
+            // Player encoding consistency
+            if (flat_val == 1.0f) {
+                assert(has_p1_oh && !has_p2_oh && !is_available);
+            } else if (flat_val == -1.0f) {
+                assert(!has_p1_oh && has_p2_oh && !is_available);
+            }
+            
+            // No cell should have both players
+            assert(!(has_p1_oh && has_p2_oh));
+        }
+    }
+    std::cout << "  ✓ 10x10 complex game sequence maintains perfect consistency" << std::endl;
+    
+    // Test 12: Large board edge case and stress testing
+    std::cout << "\n12. Testing large board edge cases and stress scenarios..." << std::endl;
+    
+    // Test nearly full 6x6 board
+    env_6x6.reset();
+    std::vector<int> fill_6x6;
+    for (int i = 0; i < 34; ++i) fill_6x6.push_back(i);  // Fill 34 of 36 cells
+    
+    for (int move : fill_6x6) {
+        env_6x6.step(Action{move});
+    }
+    
+    std::vector<float> nearly_full_flat_6x6 = env_6x6.get_flattened_state();
+    std::vector<float> nearly_full_oh_6x6 = env_6x6.get_one_hot_state();
+    std::vector<bool> nearly_full_mask_6x6 = env_6x6.get_action_mask();
+    
+    // Count available cells
+    int available_count_6x6 = 0;
+    for (int i = 0; i < 36; ++i) {
+        if (nearly_full_mask_6x6[i]) available_count_6x6++;
+    }
+    assert(available_count_6x6 == 2);  // Should have exactly 2 cells left
+    
+    // Verify all representations agree on available cells
+    for (int i = 0; i < 36; ++i) {
+        bool is_empty_flat = (nearly_full_flat_6x6[i] == 0.0f);
+        bool is_empty_oh = (nearly_full_oh_6x6[i] == 0.0f && nearly_full_oh_6x6[36 + i] == 0.0f);
+        bool is_available = nearly_full_mask_6x6[i];
+        assert(is_empty_flat == is_empty_oh);
+        assert(is_empty_flat == is_available);
+    }
+    std::cout << "  ✓ 6x6 nearly full board (34/36 cells) consistency verified" << std::endl;
+    
+    // Test nearly full 10x10 board
+    env_10x10.reset();
+    std::vector<int> fill_10x10;
+    for (int i = 0; i < 95; ++i) fill_10x10.push_back(i);  // Fill 95 of 100 cells
+    
+    for (int move : fill_10x10) {
+        env_10x10.step(Action{move});
+    }
+    
+    std::vector<float> nearly_full_flat_10x10 = env_10x10.get_flattened_state();
+    std::vector<float> nearly_full_oh_10x10 = env_10x10.get_one_hot_state();
+    std::vector<bool> nearly_full_mask_10x10 = env_10x10.get_action_mask();
+    
+    // Count available cells
+    int available_count_10x10 = 0;
+    for (int i = 0; i < 100; ++i) {
+        if (nearly_full_mask_10x10[i]) available_count_10x10++;
+    }
+    assert(available_count_10x10 == 5);  // Should have exactly 5 cells left
+    
+    // Verify all representations agree on available cells
+    for (int i = 0; i < 100; ++i) {
+        bool is_empty_flat = (nearly_full_flat_10x10[i] == 0.0f);
+        bool is_empty_oh = (nearly_full_oh_10x10[i] == 0.0f && nearly_full_oh_10x10[100 + i] == 0.0f);
+        bool is_available = nearly_full_mask_10x10[i];
+        assert(is_empty_flat == is_empty_oh);
+        assert(is_empty_flat == is_available);
+    }
+    std::cout << "  ✓ 10x10 nearly full board (95/100 cells) consistency verified" << std::endl;
+    
+    // Test 13: Cross-board size comparison and scaling validation
+    std::cout << "\n13. Testing cross-board size scaling and consistency patterns..." << std::endl;
+    
+    // Test that the same logical patterns work across different board sizes
+    std::vector<int> test_sizes = {6, 10};
+    for (int N : test_sizes) {
+        auto reward_fn_N = std::make_shared<DefaultReward>();
+        Environment env_N(N, reward_fn_N);
+        env_N.reset();
+        
+        // Place pieces in corners and center
+        std::vector<int> pattern_moves = {
+            0,              // Top-left
+            N - 1,          // Top-right
+            (N - 1) * N,    // Bottom-left
+            N * N - 1,      // Bottom-right
+            (N / 2) * N + (N / 2)  // Center (approximately)
+        };
+        
+        for (int i = 0; i < pattern_moves.size(); ++i) {
+            if (i < pattern_moves.size()) {
+                env_N.step(Action{pattern_moves[i]});
+            }
+        }
+        
+        std::vector<float> pattern_flat = env_N.get_flattened_state();
+        std::vector<float> pattern_oh = env_N.get_one_hot_state();
+        std::vector<bool> pattern_mask = env_N.get_action_mask();
+        
+        // Verify consistency across this pattern
+        for (int i = 0; i < N * N; ++i) {
+            bool is_empty_flat = (pattern_flat[i] == 0.0f);
+            bool is_empty_oh = (pattern_oh[i] == 0.0f && pattern_oh[N*N + i] == 0.0f);
+            bool is_available = pattern_mask[i];
+            assert(is_empty_flat == is_empty_oh);
+            assert(is_empty_flat == is_available);
+        }
+    }
+    std::cout << "  ✓ Cross-board size scaling patterns work consistently" << std::endl;
+    
+    // Test 14: Performance and memory characteristics on larger boards
+    std::cout << "\n14. Testing performance and memory characteristics..." << std::endl;
+    
+    // Test rapid successive calls don't cause memory issues
+    env_6x6.reset();
+    for (int i = 0; i < 20; ++i) {
+        std::vector<float> temp_flat = env_6x6.get_flattened_state();
+        std::vector<float> temp_oh = env_6x6.get_one_hot_state();
+        std::vector<bool> temp_mask = env_6x6.get_action_mask();
+        
+        // Verify sizes remain consistent
+        assert(temp_flat.size() == 36);
+        assert(temp_oh.size() == 72);
+        assert(temp_mask.size() == 36);
+        
+        if (i < 10) {
+            env_6x6.step(Action{i});
+        }
+    }
+    std::cout << "  ✓ 6x6 board handles rapid successive state queries correctly" << std::endl;
+    
+    env_10x10.reset();
+    for (int i = 0; i < 20; ++i) {
+        std::vector<float> temp_flat = env_10x10.get_flattened_state();
+        std::vector<float> temp_oh = env_10x10.get_one_hot_state();
+        std::vector<bool> temp_mask = env_10x10.get_action_mask();
+        
+        // Verify sizes remain consistent
+        assert(temp_flat.size() == 100);
+        assert(temp_oh.size() == 200);
+        assert(temp_mask.size() == 100);
+        
+        if (i < 10) {
+            env_10x10.step(Action{i});
+        }
+    }
+    std::cout << "  ✓ 10x10 board handles rapid successive state queries correctly" << std::endl;
+    
+    std::cout << "\n=== ALL LARGER BOARD INTEGRATION TESTS PASSED! ===" << std::endl;
+    
     std::cout << "\n=== ALL EPIC 2 INTEGRATION TESTS PASSED! ===" << std::endl;
     std::cout << "✓ Flattened State Vector (US2.1) ✓" << std::endl;
     std::cout << "✓ One-Hot Encoding Option (US2.2) ✓" << std::endl;  
     std::cout << "✓ Action Masking (US2.3) ✓" << std::endl;
     std::cout << "✓ All three features work together seamlessly! ✓" << std::endl;
+    std::cout << "✓ 6x6 and 10x10 Board Integration ✓" << std::endl;
     
     return 0;
 } 

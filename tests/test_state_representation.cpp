@@ -309,10 +309,234 @@ int main() {
     
     std::cout << "\n=== All US2.2 tests passed! ===" << std::endl;
     
+    std::cout << "\n=== TESTING LARGER BOARD SIZES (6x6 and 10x10) STATE REPRESENTATIONS ===" << std::endl;
+    
+    // Test 18: 6x6 Board State Representations
+    std::cout << "\n18. Testing 6x6 board state representations..." << std::endl;
+    auto reward_fn_6x6 = std::make_shared<DefaultReward>();
+    Environment env_6x6(6, reward_fn_6x6);
+    
+    // Action masking for 6x6
+    env_6x6.reset();
+    std::vector<bool> mask_6x6_empty = env_6x6.get_action_mask();
+    assert(mask_6x6_empty.size() == 36);  // 6x6 = 36 cells
+    for (int i = 0; i < 36; ++i) {
+        assert(mask_6x6_empty[i] == true);  // All cells available on empty board
+    }
+    std::cout << "  ✓ 6x6 action mask on empty board works (36 cells all available)" << std::endl;
+    
+    // Test action mask after moves on 6x6
+    env_6x6.step(Action{0});  // Player 1 at (0,0)
+    env_6x6.step(Action{35}); // Player 2 at (5,5) - bottom right
+    env_6x6.step(Action{18}); // Player 1 at center (3,0)
+    std::vector<bool> mask_6x6_partial = env_6x6.get_action_mask();
+    assert(mask_6x6_partial[0] == false);   // Occupied by Player 1
+    assert(mask_6x6_partial[35] == false);  // Occupied by Player 2
+    assert(mask_6x6_partial[18] == false);  // Occupied by Player 1
+    assert(mask_6x6_partial[1] == true);    // Should be available
+    assert(mask_6x6_partial[17] == true);   // Should be available
+    std::cout << "  ✓ 6x6 action mask correctly tracks occupied cells" << std::endl;
+    
+    // Flattened state for 6x6
+    env_6x6.reset();
+    std::vector<float> flat_6x6_empty = env_6x6.get_flattened_state();
+    assert(flat_6x6_empty.size() == 36);  // 6x6 = 36 elements
+    for (int i = 0; i < 36; ++i) {
+        assert(flat_6x6_empty[i] == 0.0f);  // All empty
+    }
+    std::cout << "  ✓ 6x6 flattened state on empty board works (36 elements all 0.0)" << std::endl;
+    
+    // Test flattened state with moves on 6x6
+    env_6x6.step(Action{0});   // Player 1 at (0,0)
+    env_6x6.step(Action{35});  // Player 2 at (5,5)
+    env_6x6.step(Action{18});  // Player 1 at (3,0)
+    std::vector<float> flat_6x6_partial = env_6x6.get_flattened_state();
+    assert(flat_6x6_partial[0] == 1.0f);   // Player 1
+    assert(flat_6x6_partial[35] == -1.0f); // Player 2
+    assert(flat_6x6_partial[18] == 1.0f);  // Player 1
+    assert(flat_6x6_partial[1] == 0.0f);   // Empty
+    assert(flat_6x6_partial[17] == 0.0f);  // Empty
+    std::cout << "  ✓ 6x6 flattened state correctly represents player pieces" << std::endl;
+    
+    // One-hot encoding for 6x6
+    env_6x6.reset();
+    std::vector<float> oh_6x6_empty = env_6x6.get_one_hot_state();
+    assert(oh_6x6_empty.size() == 72);  // 2 * 6 * 6 = 72 for 6x6 board
+    for (int i = 0; i < 72; ++i) {
+        assert(oh_6x6_empty[i] == 0.0f);  // All channels empty
+    }
+    std::cout << "  ✓ 6x6 one-hot encoding on empty board works (72 elements all 0.0)" << std::endl;
+    
+    // Test one-hot encoding with moves on 6x6
+    env_6x6.step(Action{0});   // Player 1 at (0,0)
+    env_6x6.step(Action{35});  // Player 2 at (5,5)
+    env_6x6.step(Action{18});  // Player 1 at (3,0)
+    std::vector<float> oh_6x6_partial = env_6x6.get_one_hot_state();
+    // Player 1 channel (0-35): should have 1.0 at indices 0 and 18
+    assert(oh_6x6_partial[0] == 1.0f);   // Player 1 at (0,0)
+    assert(oh_6x6_partial[18] == 1.0f);  // Player 1 at (3,0)
+    assert(oh_6x6_partial[35] == 0.0f);  // No Player 1 at (5,5)
+    // Player 2 channel (36-71): should have 1.0 at index 71 (36+35)
+    assert(oh_6x6_partial[36 + 0] == 0.0f);  // No Player 2 at (0,0)
+    assert(oh_6x6_partial[36 + 35] == 1.0f); // Player 2 at (5,5)
+    assert(oh_6x6_partial[36 + 18] == 0.0f); // No Player 2 at (3,0)
+    std::cout << "  ✓ 6x6 one-hot encoding correctly separates player channels" << std::endl;
+    
+    // Test 19: 10x10 Board State Representations
+    std::cout << "\n19. Testing 10x10 board state representations..." << std::endl;
+    auto reward_fn_10x10 = std::make_shared<DefaultReward>();
+    Environment env_10x10(10, reward_fn_10x10);
+    
+    // Action masking for 10x10
+    env_10x10.reset();
+    std::vector<bool> mask_10x10_empty = env_10x10.get_action_mask();
+    assert(mask_10x10_empty.size() == 100);  // 10x10 = 100 cells
+    for (int i = 0; i < 100; ++i) {
+        assert(mask_10x10_empty[i] == true);  // All cells available on empty board
+    }
+    std::cout << "  ✓ 10x10 action mask on empty board works (100 cells all available)" << std::endl;
+    
+    // Test action mask after moves on 10x10
+    env_10x10.step(Action{0});   // Player 1 at (0,0)
+    env_10x10.step(Action{99});  // Player 2 at (9,9) - bottom right
+    env_10x10.step(Action{44});  // Player 1 at center-ish (4,4)
+    env_10x10.step(Action{55});  // Player 2 at (5,5)
+    std::vector<bool> mask_10x10_partial = env_10x10.get_action_mask();
+    assert(mask_10x10_partial[0] == false);   // Occupied by Player 1
+    assert(mask_10x10_partial[99] == false);  // Occupied by Player 2
+    assert(mask_10x10_partial[44] == false);  // Occupied by Player 1
+    assert(mask_10x10_partial[55] == false);  // Occupied by Player 2
+    assert(mask_10x10_partial[1] == true);    // Should be available
+    assert(mask_10x10_partial[50] == true);   // Should be available
+    std::cout << "  ✓ 10x10 action mask correctly tracks occupied cells" << std::endl;
+    
+    // Flattened state for 10x10
+    env_10x10.reset();
+    std::vector<float> flat_10x10_empty = env_10x10.get_flattened_state();
+    assert(flat_10x10_empty.size() == 100);  // 10x10 = 100 elements
+    for (int i = 0; i < 100; ++i) {
+        assert(flat_10x10_empty[i] == 0.0f);  // All empty
+    }
+    std::cout << "  ✓ 10x10 flattened state on empty board works (100 elements all 0.0)" << std::endl;
+    
+    // Test flattened state with moves on 10x10
+    env_10x10.step(Action{0});   // Player 1 at (0,0)
+    env_10x10.step(Action{99});  // Player 2 at (9,9)
+    env_10x10.step(Action{44});  // Player 1 at (4,4)
+    env_10x10.step(Action{55});  // Player 2 at (5,5)
+    std::vector<float> flat_10x10_partial = env_10x10.get_flattened_state();
+    assert(flat_10x10_partial[0] == 1.0f);   // Player 1
+    assert(flat_10x10_partial[99] == -1.0f); // Player 2
+    assert(flat_10x10_partial[44] == 1.0f);  // Player 1
+    assert(flat_10x10_partial[55] == -1.0f); // Player 2
+    assert(flat_10x10_partial[1] == 0.0f);   // Empty
+    assert(flat_10x10_partial[50] == 0.0f);  // Empty
+    std::cout << "  ✓ 10x10 flattened state correctly represents player pieces" << std::endl;
+    
+    // One-hot encoding for 10x10
+    env_10x10.reset();
+    std::vector<float> oh_10x10_empty = env_10x10.get_one_hot_state();
+    assert(oh_10x10_empty.size() == 200);  // 2 * 10 * 10 = 200 for 10x10 board
+    for (int i = 0; i < 200; ++i) {
+        assert(oh_10x10_empty[i] == 0.0f);  // All channels empty
+    }
+    std::cout << "  ✓ 10x10 one-hot encoding on empty board works (200 elements all 0.0)" << std::endl;
+    
+    // Test one-hot encoding with moves on 10x10
+    env_10x10.step(Action{0});   // Player 1 at (0,0)
+    env_10x10.step(Action{99});  // Player 2 at (9,9)
+    env_10x10.step(Action{44});  // Player 1 at (4,4)
+    env_10x10.step(Action{55});  // Player 2 at (5,5)
+    std::vector<float> oh_10x10_partial = env_10x10.get_one_hot_state();
+    // Player 1 channel (0-99): should have 1.0 at indices 0 and 44
+    assert(oh_10x10_partial[0] == 1.0f);   // Player 1 at (0,0)
+    assert(oh_10x10_partial[44] == 1.0f);  // Player 1 at (4,4)
+    assert(oh_10x10_partial[99] == 0.0f);  // No Player 1 at (9,9)
+    assert(oh_10x10_partial[55] == 0.0f);  // No Player 1 at (5,5)
+    // Player 2 channel (100-199): should have 1.0 at indices 199 (100+99) and 155 (100+55)
+    assert(oh_10x10_partial[100 + 0] == 0.0f);  // No Player 2 at (0,0)
+    assert(oh_10x10_partial[100 + 99] == 1.0f); // Player 2 at (9,9)
+    assert(oh_10x10_partial[100 + 44] == 0.0f); // No Player 2 at (4,4)
+    assert(oh_10x10_partial[100 + 55] == 1.0f); // Player 2 at (5,5)
+    std::cout << "  ✓ 10x10 one-hot encoding correctly separates player channels" << std::endl;
+    
+    // Test 20: Cross-representation consistency on larger boards
+    std::cout << "\n20. Testing cross-representation consistency on larger boards..." << std::endl;
+    
+    // Test 6x6 consistency
+    for (int i = 0; i < 36; ++i) {
+        bool is_empty_flat = (flat_6x6_partial[i] == 0.0f);
+        bool is_empty_oh = (oh_6x6_partial[i] == 0.0f && oh_6x6_partial[36 + i] == 0.0f);
+        bool is_available = mask_6x6_partial[i];
+        assert(is_empty_flat == is_empty_oh);
+        assert(is_empty_flat == is_available);
+    }
+    std::cout << "  ✓ 6x6 board: all representations are consistent" << std::endl;
+    
+    // Test 10x10 consistency
+    for (int i = 0; i < 100; ++i) {
+        bool is_empty_flat = (flat_10x10_partial[i] == 0.0f);
+        bool is_empty_oh = (oh_10x10_partial[i] == 0.0f && oh_10x10_partial[100 + i] == 0.0f);
+        bool is_available = mask_10x10_partial[i];
+        assert(is_empty_flat == is_empty_oh);
+        assert(is_empty_flat == is_available);
+    }
+    std::cout << "  ✓ 10x10 board: all representations are consistent" << std::endl;
+    
+    // Test 21: Performance validation on larger boards
+    std::cout << "\n21. Testing performance characteristics on larger boards..." << std::endl;
+    
+    // Fill significant portion of 6x6 board and verify all representations scale
+    env_6x6.reset();
+    for (int i = 0; i < 20; ++i) {  // Fill about half the board
+        env_6x6.step(Action{i});
+    }
+    std::vector<bool> mask_6x6_half = env_6x6.get_action_mask();
+    std::vector<float> flat_6x6_half = env_6x6.get_flattened_state();
+    std::vector<float> oh_6x6_half = env_6x6.get_one_hot_state();
+    
+    // Verify sizes
+    assert(mask_6x6_half.size() == 36);
+    assert(flat_6x6_half.size() == 36);
+    assert(oh_6x6_half.size() == 72);
+    
+    // Count occupied cells
+    int occupied_count = 0;
+    for (int i = 0; i < 36; ++i) {
+        if (!mask_6x6_half[i]) occupied_count++;
+    }
+    assert(occupied_count == 20);  // Should have 20 occupied cells
+    std::cout << "  ✓ 6x6 board handles partial fills correctly (20/36 cells occupied)" << std::endl;
+    
+    // Fill significant portion of 10x10 board
+    env_10x10.reset();
+    for (int i = 0; i < 50; ++i) {  // Fill half the board
+        env_10x10.step(Action{i});
+    }
+    std::vector<bool> mask_10x10_half = env_10x10.get_action_mask();
+    std::vector<float> flat_10x10_half = env_10x10.get_flattened_state();
+    std::vector<float> oh_10x10_half = env_10x10.get_one_hot_state();
+    
+    // Verify sizes
+    assert(mask_10x10_half.size() == 100);
+    assert(flat_10x10_half.size() == 100);
+    assert(oh_10x10_half.size() == 200);
+    
+    // Count occupied cells
+    occupied_count = 0;
+    for (int i = 0; i < 100; ++i) {
+        if (!mask_10x10_half[i]) occupied_count++;
+    }
+    assert(occupied_count == 50);  // Should have 50 occupied cells
+    std::cout << "  ✓ 10x10 board handles partial fills correctly (50/100 cells occupied)" << std::endl;
+    
+    std::cout << "\n=== ALL LARGER BOARD STATE REPRESENTATION TESTS PASSED! ===" << std::endl;
+    
     std::cout << "\n=== ALL EPIC 2 STATE REPRESENTATION TESTS PASSED! ===" << std::endl;
     std::cout << "✓ Action Masking (US2.3) ✓" << std::endl;
     std::cout << "✓ Flattened State Vector (US2.1) ✓" << std::endl;
     std::cout << "✓ One-Hot Encoding Option (US2.2) ✓" << std::endl;
+    std::cout << "✓ 6x6 and 10x10 Board State Representations ✓" << std::endl;
     
     return 0;
 } 

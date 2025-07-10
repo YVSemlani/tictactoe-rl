@@ -76,6 +76,19 @@ Tests the fundamental game mechanics and environment functionality.
   - *How it tests*: Takes a few moves with no winning pattern, verifies `done == false`
   - *Validation*: Game correctly continues when no terminal condition
 
+#### Larger Board Tests (6x6 and 10x10)
+- **6x6 Board Comprehensive Test**: Validates all core functionality on 6x6 boards (36 cells)
+  - *How it tests*: Tests initialization, player alternation, bounds validation, and all win patterns (6-in-a-row)
+  - *Validation*: All core mechanics work correctly on larger boards
+
+- **10x10 Board Comprehensive Test**: Validates all core functionality on 10x10 boards (100 cells)
+  - *How it tests*: Tests initialization, player alternation, bounds validation, and all win patterns (10-in-a-row)
+  - *Validation*: All core mechanics scale properly to very large boards
+
+- **Large Board Win Detection Tests**: Validates horizontal, vertical, and diagonal wins on larger boards
+  - *How it tests*: Creates N-in-a-row patterns for both 6x6 and 10x10 boards
+  - *Validation*: Win detection algorithms work correctly regardless of board size
+
 ### test_state_representation.cpp - Epic 2: State & Action Representation
 
 Tests the three state representation methods individually to ensure each works correctly.
@@ -151,6 +164,23 @@ Tests the three state representation methods individually to ensure each works c
   - *How it tests*: Places pieces from both players, verifies channel offsets and no overlap
   - *Validation*: Channels properly organized with correct offsets
 
+#### Larger Board State Representation Tests (6x6 and 10x10)
+- **6x6 Board State Representations**: Comprehensive testing of all state methods on 6x6 boards
+  - *How it tests*: Validates action mask (36 cells), flattened state (36 elements), one-hot (72 elements) with various move patterns
+  - *Validation*: All state representations scale correctly to 36-cell boards
+
+- **10x10 Board State Representations**: Comprehensive testing of all state methods on 10x10 boards
+  - *How it tests*: Validates action mask (100 cells), flattened state (100 elements), one-hot (200 elements) with complex patterns
+  - *Validation*: All state representations scale correctly to 100-cell boards
+
+- **Cross-Representation Consistency on Large Boards**: Validates consistency between all representations on larger boards
+  - *How it tests*: Places pieces on 6x6 and 10x10 boards, verifies flattened/one-hot/action-mask agreement on every cell
+  - *Validation*: Perfect consistency maintained across representations regardless of board size
+
+- **Performance Validation on Large Boards**: Tests partial board fills and stress scenarios
+  - *How it tests*: Fills significant portions of large boards (20/36 cells, 50/100 cells), validates all representations
+  - *Validation*: System handles large state spaces efficiently without degradation
+
 ### test_integration.cpp - Epic 2: State Representation Integration
 
 Tests that all three state representation methods work together seamlessly and remain consistent.
@@ -193,6 +223,27 @@ Tests that all three state representation methods work together seamlessly and r
 - **Memory Efficiency Validation Test**: Validates no data corruption between calls
   - *How it tests*: Captures states before/after moves, verifies previous states unchanged
   - *Validation*: No memory corruption, all representations independent
+
+#### Large Board Integration Tests (6x6 and 10x10)
+- **6x6 Board Comprehensive Integration**: End-to-end validation of all state representations working together on 6x6 boards
+  - *How it tests*: Complex 16-move game sequence, verifies perfect consistency across all 36 cells after each move
+  - *Validation*: All three representations evolve consistently throughout complex gameplay on larger boards
+
+- **10x10 Board Comprehensive Integration**: End-to-end validation of all state representations working together on 10x10 boards
+  - *How it tests*: Complex 16-move game sequence, verifies perfect consistency across all 100 cells after each move
+  - *Validation*: All three representations scale seamlessly to very large board sizes
+
+- **Large Board Edge Case Testing**: Stress testing with nearly full boards
+  - *How it tests*: Fills 34/36 cells on 6x6 and 95/100 cells on 10x10, validates perfect representation agreement
+  - *Validation*: System maintains consistency even when boards are nearly saturated
+
+- **Cross-Board Size Scaling Validation**: Tests consistency patterns across different board sizes
+  - *How it tests*: Places identical logical patterns (corners, center) on both 6x6 and 10x10 boards
+  - *Validation*: Same logical operations produce consistent results regardless of board scale
+
+- **Performance and Memory Characteristics**: Validates system behavior under rapid state queries
+  - *How it tests*: Performs 20 rapid successive state queries on large boards while making moves
+  - *Validation*: System handles high-frequency operations without memory issues or consistency degradation
 
 ## Running Tests
 
