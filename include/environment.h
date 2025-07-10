@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <stdexcept>
 
 struct BoardState {
     std::vector<int> cells;
@@ -42,4 +43,5 @@ public:
 private:
     BoardState current_state;
     std::shared_ptr<RewardCallback> reward_fn;
+    int current_player;  // 1 for player1, -1 for player2
 }; 
