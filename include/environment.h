@@ -44,4 +44,11 @@ private:
     BoardState current_state;
     std::shared_ptr<RewardCallback> reward_fn;
     int current_player;  // 1 for player1, -1 for player2
+    
+    // Terminal detection helper methods
+    bool check_win(const BoardState& state, int player) const;
+    bool check_horizontal_win(const BoardState& state, int player) const;
+    bool check_vertical_win(const BoardState& state, int player) const;
+    bool check_diagonal_win(const BoardState& state, int player) const;
+    bool is_board_full(const BoardState& state) const;
 }; 

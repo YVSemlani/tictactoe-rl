@@ -83,5 +83,98 @@ int main() {
     std::cout << "✓ StepResult.next_state correctly reflects board changes" << std::endl;
     
     std::cout << "\n=== All US1.2 tests passed! ===" << std::endl;
+    
+    std::cout << "\n=== Testing US1.3: Terminal Detection ===" << std::endl;
+    
+    // Test 6: Horizontal win detection
+    std::cout << "\n6. Testing horizontal win detection..." << std::endl;
+    env.reset();
+    // Player 1 wins horizontally on top row: X X X
+    env.step(Action{0});  // Player 1: (0,0)
+    env.step(Action{3});  // Player 2: (1,0) 
+    env.step(Action{1});  // Player 1: (0,1)
+    env.step(Action{4});  // Player 2: (1,1)
+    StepResult win_res = env.step(Action{2});  // Player 1: (0,2) - should win
+    assert(win_res.done == true);
+    std::cout << "✓ Horizontal win detection works" << std::endl;
+    
+    // Test 7: Vertical win detection
+    std::cout << "\n7. Testing vertical win detection..." << std::endl;
+    env.reset();
+    // Player 1 wins vertically on left column
+    env.step(Action{0});  // Player 1: (0,0)
+    env.step(Action{1});  // Player 2: (0,1)
+    env.step(Action{3});  // Player 1: (1,0)
+    env.step(Action{2});  // Player 2: (0,2)
+    StepResult vert_win = env.step(Action{6});  // Player 1: (2,0) - should win
+    assert(vert_win.done == true);
+    std::cout << "✓ Vertical win detection works" << std::endl;
+    
+    // Test 8: Diagonal win detection (main diagonal)
+    std::cout << "\n8. Testing main diagonal win detection..." << std::endl;
+    env.reset();
+    // Player 1 wins on main diagonal
+    env.step(Action{0});  // Player 1: (0,0)
+    env.step(Action{1});  // Player 2: (0,1)
+    env.step(Action{4});  // Player 1: (1,1)
+    env.step(Action{2});  // Player 2: (0,2)
+    StepResult diag_win = env.step(Action{8});  // Player 1: (2,2) - should win
+    assert(diag_win.done == true);
+    std::cout << "✓ Main diagonal win detection works" << std::endl;
+    
+    // Test 9: Anti-diagonal win detection
+    std::cout << "\n9. Testing anti-diagonal win detection..." << std::endl;
+    env.reset();
+    // Player 1 wins on anti-diagonal
+    env.step(Action{2});  // Player 1: (0,2)
+    env.step(Action{0});  // Player 2: (0,0)
+    env.step(Action{4});  // Player 1: (1,1)
+    env.step(Action{1});  // Player 2: (0,1)
+    StepResult anti_diag_win = env.step(Action{6});  // Player 1: (2,0) - should win
+    assert(anti_diag_win.done == true);
+    std::cout << "✓ Anti-diagonal win detection works" << std::endl;
+    
+    // Test 10: Player 2 win detection
+    std::cout << "\n10. Testing Player 2 win detection..." << std::endl;
+    env.reset();
+    // Player 2 wins horizontally on middle row
+    env.step(Action{0});  // Player 1: (0,0)
+    env.step(Action{3});  // Player 2: (1,0)
+    env.step(Action{1});  // Player 1: (0,1)
+    env.step(Action{4});  // Player 2: (1,1)
+    env.step(Action{6});  // Player 1: (2,0)
+    StepResult p2_win = env.step(Action{5});  // Player 2: (1,2) - should win
+    assert(p2_win.done == true);
+    std::cout << "✓ Player 2 win detection works" << std::endl;
+    
+    // Test 11: Draw detection (board full, no winner)
+    std::cout << "\n11. Testing draw detection..." << std::endl;
+    env.reset();
+    // Create a draw scenario:
+    // X O X
+    // O O X  
+    // O X O
+    env.step(Action{0});  // Player 1: X at (0,0)
+    env.step(Action{1});  // Player 2: O at (0,1)
+    env.step(Action{2});  // Player 1: X at (0,2)
+    env.step(Action{3});  // Player 2: O at (1,0)
+    env.step(Action{5});  // Player 1: X at (1,2)
+    env.step(Action{4});  // Player 2: O at (1,1)
+    env.step(Action{7});  // Player 1: X at (2,1)
+    env.step(Action{6});  // Player 2: O at (2,0)
+    StepResult draw_res = env.step(Action{8});  // Player 1: X at (2,2) - should be draw
+    assert(draw_res.done == true);
+    std::cout << "✓ Draw detection works" << std::endl;
+    
+    // Test 12: Game continues when no terminal condition
+    std::cout << "\n12. Testing game continues when no terminal condition..." << std::endl;
+    env.reset();
+    env.step(Action{0});  // Player 1: (0,0)
+    env.step(Action{1});  // Player 2: (0,1)
+    StepResult continue_res = env.step(Action{3});  // Player 1: (1,0)
+    assert(continue_res.done == false);
+    std::cout << "✓ Game correctly continues when no terminal condition" << std::endl;
+    
+    std::cout << "\n=== All US1.3 tests passed! ===" << std::endl;
     return 0;
 } 

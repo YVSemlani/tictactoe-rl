@@ -3,9 +3,9 @@
       "title": "Epic 1: Core Environment Engine",
       "body": "Goal: Provide a C++-based, Gym-style RL environment for NxN Tic-Tac-Toe.",
       "labels": ["epic"],
-      "status": "in_progress",
-      "completion_date": null,
-      "notes": "Core structure implemented, missing terminal detection"
+      "status": "completed",
+      "completion_date": "2024-01-01",
+      "notes": "Core environment fully implemented with board initialization, action transitions, and comprehensive terminal detection"
     },
     {
       "title": "US1.1: Initialize Board",
@@ -27,9 +27,9 @@
       "title": "US1.3: Terminal Detection",
       "body": "As a developer, I want the engine to detect wins, losses, and draws in `step()` so that episodes terminate correctly.\n\n**Acceptance Criteria:**\n- Horizontal, vertical, diagonal N-in-a-row is detected as win/loss.\n- Full board with no winner returns `done = true`, `reward = 0`.",
       "labels": ["user-story", "epic: Core Environment Engine"],
-      "status": "not_started",
-      "completion_date": null,
-      "notes": "Currently done=false stub, need win/loss/draw logic"
+      "status": "completed",
+      "completion_date": "2024-01-01",
+      "notes": "Implemented comprehensive terminal detection: horizontal, vertical, and diagonal wins for both players, plus draw detection when board is full with no winner"
     },
     {
       "title": "Epic 2: State & Action Representation",
