@@ -1,0 +1,14 @@
+# Ignore build directories
+build/
+
+# Ignore temporary files
+*.o      # Object files
+*.exe    # Windows executables
+*.out    # Unix executables
+
+# Ignore IDE/editor files
+.DS_Store  # macOS-specific
+*.swp     # Vim swap files
+
+# Ignore other common temp dirs
+temp/
