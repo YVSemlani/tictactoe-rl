@@ -7,11 +7,27 @@ int main() {
     auto reward_fn = std::make_shared<DefaultReward>();
     Environment env(3, reward_fn);
     
-    std::cout << "=== Testing US1.2: Apply Action & Transition ===" << std::endl;
+    std::cout << "=== Testing Epic 1: Core Environment Engine ===" << std::endl;
+    
+    std::cout << "\n=== Testing US1.1: Initialize Board (implicit) ===" << std::endl;
+    
+    // Test: Board initialization
+    std::cout << "\nTesting board initialization..." << std::endl;
+    BoardState state = env.reset();
+    std::cout << "After reset, board size: " << state.cells.size() << std::endl;
+    std::cout << "Board dimension N: " << state.N << std::endl;
+    assert(state.cells.size() == 9);  // 3x3 board
+    assert(state.N == 3);
+    for (int i = 0; i < 9; ++i) {
+        assert(state.cells[i] == 0);  // All cells empty
+    }
+    std::cout << "✓ Board initialization works correctly" << std::endl;
+    
+    std::cout << "\n=== Testing US1.2: Apply Action & Transition ===" << std::endl;
     
     // Test 1: Basic functionality
     std::cout << "\n1. Testing basic reset and step..." << std::endl;
-    BoardState state = env.reset();
+    state = env.reset();
     std::cout << "After reset, cell 0: " << state.cells[0] << std::endl;
     assert(state.cells[0] == 0);
     
@@ -176,5 +192,11 @@ int main() {
     std::cout << "✓ Game correctly continues when no terminal condition" << std::endl;
     
     std::cout << "\n=== All US1.3 tests passed! ===" << std::endl;
+    
+    std::cout << "\n=== ALL EPIC 1 CORE ENGINE TESTS PASSED! ===" << std::endl;
+    std::cout << "✓ Initialize Board (US1.1) ✓" << std::endl;
+    std::cout << "✓ Apply Action & Transition (US1.2) ✓" << std::endl;
+    std::cout << "✓ Terminal Detection (US1.3) ✓" << std::endl;
+    
     return 0;
 } 

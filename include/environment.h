@@ -40,6 +40,12 @@ public:
     Environment(int N, std::shared_ptr<RewardCallback> reward_fn);
     BoardState reset();
     StepResult step(const Action& action);
+    std::vector<bool> get_action_mask() const;
+    std::vector<float> get_flattened_state() const;
+    
+    // US2.2: One-Hot Encoding Option
+    std::vector<float> get_one_hot_state() const;
+    
 private:
     BoardState current_state;
     std::shared_ptr<RewardCallback> reward_fn;

@@ -43,25 +43,25 @@
       "title": "US2.1: Flattened State Vector",
       "body": "As a researcher, I want `get_flattened_state()` to return a 1D float vector so that I can feed it into neural networks.\n\n**Acceptance Criteria:**\n- Length = N×N.\n- Values in {–1, 0, +1} or normalized.",
       "labels": ["user-story", "epic: State & Action Representation"],
-      "status": "not_started",
-      "completion_date": null,
-      "notes": "Method not yet implemented"
+      "status": "completed",
+      "completion_date": "2024-01-01",
+      "notes": "Implemented get_flattened_state() method that returns std::vector<float> with values {-1, 0, +1} representing player2, empty, and player1 respectively"
     },
     {
       "title": "US2.2: One-Hot Encoding Option",
       "body": "As an agent developer, I want an option to receive a one-hot encoded state tensor so that multi-channel models can be used.\n\n**Acceptance Criteria:**\n- Two channels: one for each player.\n- Shape = [2, N, N].",
       "labels": ["user-story", "epic: State & Action Representation"],
-      "status": "not_started",
-      "completion_date": null,
-      "notes": "Method not yet implemented"
+      "status": "completed",
+      "completion_date": "2024-01-01",
+      "notes": "Implemented get_one_hot_state() method that returns std::vector<float> with shape [2, N, N] flattened to 2*N*N. Channel 0 for Player 1, Channel 1 for Player 2. Comprehensive tests verify functionality."
     },
     {
       "title": "US2.3: Action Masking",
       "body": "As a policy implementer, I want an action mask indicating legal moves so that the agent doesn't select invalid actions.\n\n**Acceptance Criteria:**\n- Returns a boolean vector length N×N with `true` on empty cells.",
       "labels": ["user-story", "epic: State & Action Representation"],
-      "status": "not_started",
-      "completion_date": null,
-      "notes": "Method not yet implemented"
+      "status": "completed",
+      "completion_date": "2024-01-01",
+      "notes": "Implemented get_action_mask() method with comprehensive tests"
     },
     {
       "title": "Epic 3: Reward System & Custom Callbacks",

@@ -16,4 +16,12 @@ jobs:
         cmake ..
         make
     - name: Run tests
-      run: cd build && ./env_test 
+      run: |
+        cd build
+        echo "=== Running Core Engine Tests ==="
+        ./test_core_engine
+        echo "=== Running State Representation Tests ==="
+        ./test_state_representation
+        echo "=== Running Integration Tests ==="
+        ./test_integration
+        echo "=== All Test Suites Completed Successfully ===" 

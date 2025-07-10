@@ -113,4 +113,44 @@ bool Environment::is_board_full(const BoardState& state) const {
         }
     }
     return true;
+}
+
+std::vector<bool> Environment::get_action_mask() const {
+    std::vector<bool> mask(current_state.N * current_state.N);
+    for (int i = 0; i < current_state.N * current_state.N; ++i) {
+        mask[i] = (current_state.cells[i] == 0);  // true for empty cells, false for occupied
+    }
+    return mask;
+}
+
+std::vector<float> Environment::get_flattened_state() const {
+    std::vector<float> flattened_state(current_state.N * current_state.N);
+    for (int i = 0; i < current_state.N * current_state.N; ++i) {
+        flattened_state[i] = static_cast<float>(current_state.cells[i]);
+    }
+    return flattened_state;
+} 
+
+// US2.2: One-Hot Encoding Option
+std::vector<float> Environment::get_one_hot_state() const {
+    const int N = current_state.N;
+    const int board_size = N * N;
+    
+    // Create one-hot tensor with shape [2, N, N] flattened to 2*N*N
+    std::vector<float> one_hot(2 * board_size, 0.0f);
+    
+    for (int i = 0; i < board_size; ++i) {
+        int cell_value = current_state.cells[i];
+        
+        if (cell_value == 1) {
+            // Player 1 channel (first N*N elements)
+            one_hot[i] = 1.0f;
+        } else if (cell_value == -1) {
+            // Player 2 channel (second N*N elements)
+            one_hot[board_size + i] = 1.0f;
+        }
+        // Empty cells (cell_value == 0) remain 0.0f in both channels
+    }
+    
+    return one_hot;
 } 
